@@ -1,0 +1,34 @@
+/**
+* superclass: /
+* subclass: /
+* Input: freshclam log
+* Output: object from freshClamUpdater that stores information about the update
+* Attributes: time of wake up, version for all three files (daily.cld, main.cvd, bytecode.cvd)
+* Description: reads the freshClam log and stores the information in a freshClamUpdater object
+* Collaborator: Scanner
+* @author Peter
+* v1.00
+*/
+
+public class freshClamUpdaterReader extends logReader {
+	
+	public freshClamUpdaterReader(){}
+	public freshClamUpdaterReader(String inputFile){}
+	
+	/**
+	 * Reads and parses the freshclam log file and stores the information
+	 */
+	public void readFile() throws unknownLineException{}
+	
+	/**
+	 * gets attributes
+	 * @return var of accessor
+	 */
+	public var accessorFunctions(){}
+	
+	/**
+	 * sets attributes
+	 * @param n the variable to be set
+	 */
+	public void mutatorFunctions(var n){}
+}

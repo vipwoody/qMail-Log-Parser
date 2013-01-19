@@ -1,0 +1,345 @@
+/**
+ * Folder v1.01
+ * GENERIC list class
+ * v1.01
+ * 
+ * HOW TO USE:
+ * example:
+ * list<messageInput> mInList=new list<messageInput>();
+ * mInList.addToStart();
+ * 
+ * @author Ryan Nasr
+ * @param <T>
+ */
+import java.io.Serializable;;
+public class list<T> implements Serializable{
+	/**
+	 * generic inner node class for generic list 
+	 * @author RyanLaptop
+	 *
+	 * @param <T>
+	 */
+	public class node<T> implements Serializable{
+		/*CONTAINS OBJECT IN NODE*/
+		private T c;
+		/*CONTAINS POINTER TO NEXT NODE*/
+		private node<T> next;
+		/**
+		 * default constructor
+		 */
+		public node(){
+			c=null;
+			next=null;
+		}
+		/**
+		 * parameterized constructor
+		 * @param a
+		 * @param n
+		 */
+		public node(T a, node<T> n){
+			c=a;
+			next=n;
+		}
+		/**
+		 * get Object in node
+		 * @return T
+		 */
+		public T getIt(){
+			return c;
+		}
+		/**
+		 * get pointer to next node
+		 * @return
+		 */
+		public node<T> getNext(){
+			return next;
+		}
+		/**
+		 * set object in node
+		 * @param a
+		 */
+		public void setIt(T a){
+			c=a;
+		}
+		/**
+		 * set pointer to next node
+		 * @param n
+		 */
+		public void setNext(node<T> n){
+			next=n;
+		}
+		/**
+		 * verifies if there is a next
+		 * @return
+		 */
+		public boolean hasNext(){
+			if (next!=null)
+				return true;
+			return false;
+		}
+		public String toString(){
+			return c.toString();
+		}
+	}
+	private node<T> end;
+	/*STORES STARTING NODE OF LIST*/
+	private node<T> head;
+	/*STORES CURRENT SIZE OF LIST*/
+	private int size;
+	/**
+	 * default constructor
+	 */
+	public list(){
+		head=null;
+		end=null;
+		size=0;
+	}
+	/**
+	 * gets Head node
+	 * @return
+	 */
+	public node<T> getHead(){
+		return head;
+	}
+	/**
+	 * gets size of list
+	 * @return
+	 */
+	public int getSize(){
+		return size;
+	}
+	/**
+	 * returns object in node at index 
+	 * @param index
+	 * @return
+	 */
+	public T getIt(int index){
+		node<T> temp=head;
+		T tempt;
+		int i=0;
+		while (i!=index){
+			temp=temp.getNext();
+			i++;
+		}
+		if (temp!=null)
+			tempt=temp.getIt();
+		else
+			tempt=null;
+		return tempt;
+	}
+	/**
+	 * returns the index of the ID
+	 * @param a
+	 * @return index
+	 */
+
+	public int getIndex(long a){
+		node<T> temp=head;
+		int i=0;
+		while(temp!=null){
+			if (Long.parseLong(temp.getIt().toString())==a)
+				return i;
+			temp=temp.getNext();
+			i++;
+		}
+		return -1;
+	}
+	/**
+	 * find obj by PID
+	 * @param a
+	 * @return obj
+	 */
+	public T findByPID(long a){
+		node<T> temp=head;
+		T tempt;
+		while (temp!=null){
+			tempt=temp.getIt();
+			if (tempt!=null&&Long.parseLong(tempt.toString())==a)
+				return tempt;
+			temp=temp.getNext();
+		}
+		return null;
+	}
+	/**
+	 * add to start of list
+	 * @param a
+	 */
+	public void addToStart(T a){
+		head=new node<T>(a,head);
+		if (end==null)
+			end=head;
+		size++;
+	}
+	/**
+	 * 
+	 * insert at index
+	 * @param a
+	 * @param index
+	 * @throws outOfBoundsException
+	 */
+	public void insertAtIndex(T a, int index) throws outOfBoundsException{
+		node<T> temp=head;
+		int i=0;
+		if (index<0||index>(size-1))
+			throw new outOfBoundsException(index);
+		if (index==0)
+			addToStart(a);
+		else{
+			while(i!=index-1){
+				temp=temp.getNext();
+				i++;
+			}
+			temp.setNext(new node<T>(a,temp.getNext()));
+			size++;
+		}
+	}
+	/**
+	 * adds object to the end of the list
+	 * @param a
+	 */
+	public void addToLast(T a){
+		if (end==null)
+			addToStart(a);
+		else{
+			end.setNext(new node<T>(a,null));
+			end=end.getNext();
+		}
+	}
+	/**
+	 * deletes from start
+	 */
+	public T deleteFromStart() throws emptyListException{
+		T tempt=null;
+		if (head!=null){
+			if (!isEmpty()){
+				tempt=head.getIt();
+			}
+			head=head.getNext();
+			size--;
+		}
+		else
+			throw new emptyListException();
+		if (head==null)
+			end=null;
+		else
+			if (head.getNext()==null)
+				end=head;
+		return tempt;
+	}
+	/**
+	 * delete from an index
+	 * @param index
+	 * @throws outOfBoundsException
+	 */
+	public void deleteFromIndex(int index) throws outOfBoundsException{
+		
+		if (index<0||index>(size-1))
+			throw new outOfBoundsException(index);
+		if (index==0)
+			try{
+				deleteFromStart();
+			}
+			catch(emptyListException e){}
+		else{
+			node<T> temp=head;
+			int i=0;
+			while (i!=index-1){
+				temp=temp.getNext();
+				i++;
+			}
+			node<T> temp2=temp.getNext();
+			temp.setNext(temp.getNext().getNext());
+			temp2=null;
+			size--;
+		}
+	}
+	/**
+	 * find object in list
+	 * @param a
+	 * @return
+	 */
+	public T find(T a){
+		node<T> temp=head;
+		while(temp!=null){
+			if (temp.toString().equals(a.toString())){
+				return temp.getIt();
+			}
+			temp=temp.getNext();
+		}
+		return null;
+	}
+	/**
+	 * find object in list but return boolean
+	 * @param a
+	 * @return
+	 */
+	public boolean contains(T a){
+		node<T> temp=head;
+		while(temp!=null){
+			if (temp.getIt().equals(a))
+				return true;
+			temp=temp.getNext();
+		}	
+		return false;
+	}
+	/**
+	 * verify if list is empty
+	 * @return
+	 */
+	public boolean isEmpty(){
+		if (size==0)
+			return true;
+		return false;
+	}
+	
+	/**
+	 * displays list content
+	 */
+	public void showContents(){
+		node<T> temp=head;
+		if (temp==null)
+			System.out.println("LIST IS EMPTY!");
+		else{
+			while(temp!=null){
+				System.out.print(temp.getIt()+"-->");
+				temp=temp.getNext();
+			}
+			System.out.println("X");
+		}
+	}
+	/**
+	 * sorts the list by domainRank counter
+	 * @return
+	 */
+	public list<T> sort(){
+		list<T> temp=new list<T>();
+		domainRank drtemp=null;
+		domainRank drtemp2=null;
+		node<T>tempnode=head;
+		String tempo=head.getIt().getClass().toString().substring(6,head.getIt().getClass().toString().length());
+		if (tempo.equals("domainRank")&&tempnode!=null){
+			for (int i=0;i<size;i++){
+				drtemp=(domainRank)getIt(i);
+				if (drtemp.getCounter()!=1){
+					if (temp.getHead()==null)
+						temp.addToStart((T)drtemp);
+					else{
+						int k=0;
+						while(k<temp.getSize()){
+							drtemp2=(domainRank)temp.getIt(k);
+							if (drtemp.getCounter()>drtemp2.getCounter()){
+								try{
+									temp.insertAtIndex((T)drtemp,k);
+								}
+								catch(outOfBoundsException e){}
+								break;
+							}
+							k++;
+						}
+					}
+				}
+			}
+		}
+		return temp;
+	}
+}

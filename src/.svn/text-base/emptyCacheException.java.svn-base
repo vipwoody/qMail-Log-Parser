@@ -1,0 +1,26 @@
+/**
+ * When cache is empty
+ * @author RyanLaptop
+ *
+ */
+public class emptyCacheException extends Exception{
+	/**
+	 * default constructor for the emptyCacheException
+	 */
+	public emptyCacheException(){
+		super("Cache is empty!");
+	}
+	/**
+	 * parameterized constructor for the empty cache exception
+	 * @param s
+	 */
+	public emptyCacheException(String s){
+		super(s);
+	}
+	/**
+	 * getMessage returns a string for the error message
+	 */
+	public String getMessage(){
+		return super.getMessage();
+	}
+}

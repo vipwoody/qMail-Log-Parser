@@ -1,0 +1,54 @@
+import java.util.Scanner;
+/**
+ * 
+ * @author Wadih El-Ghoussoubi(Woody)
+ *
+ */
+public class queriesDriver {
+	public static void main(String[] args){
+		
+	}
+	/**
+	 * qmail queries handler
+	 * @param a
+	 */
+	public static void qmailQueries(int a){
+		switch(a){
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		case 4:
+			break;
+		}
+	}
+	/**
+	 * smtpd Queries handler
+	 * @param a
+	 */
+	public static void smtpdQueries(int a){
+		Scanner kb=new Scanner(System.in);
+		String startrange;
+		String endrange;
+		switch(a){
+		//all messeages created by timestamp RANGE
+		case 1:
+			System.out.println("Give the timestamp START range (d/m/y/h:m:s)");
+			startrange=kb.nextLine();
+			System.out.println("Give the timestamp END range (d/m/y/h:m:s)");
+			endrange=kb.nextLine();
+			
+			break;
+		//display all messages with simscan flags
+		case 2:
+
+			break;
+		//rank of ips with MOST simscan flags
+		case 3:
+			
+			break;
+		}
+	}
+}

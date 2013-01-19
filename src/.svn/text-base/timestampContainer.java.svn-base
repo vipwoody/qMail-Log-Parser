@@ -1,0 +1,35 @@
+/**
+ * contains timestamp and pointer
+ * @author Chris
+ *
+ */
+
+import java.util.Date;
+public class timestampContainer {
+	Date timestamp;
+	Object pointer;
+	public timestampContainer(){
+		timestamp=null;
+		pointer=null;
+	}
+	public timestampContainer(String tstamp,Object ptn){
+		String[] arrDate=tstamp.split("/");
+		timestamp=new Date(Integer.parseInt(arrDate[2]),Integer.parseInt(arrDate[1]),Integer.parseInt(arrDate[0]),Integer.parseInt(arrDate[3]),Integer.parseInt(arrDate[4]));
+		pointer=ptn;
+	}
+	public void setTimestamp(Date tstamp){
+		timestamp=tstamp;
+	}
+	public void setPointer(Object ptn){
+		pointer=ptn;
+	}
+	public Date getTimestamp(){
+		return timestamp;
+	}
+	public Object getPointer(){
+		return pointer;
+	}
+	public String toString(){
+		return "This container has timestamp: "+timestamp+" pointing to "+pointer;
+	}
+}

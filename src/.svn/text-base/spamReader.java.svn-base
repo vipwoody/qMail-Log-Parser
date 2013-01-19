@@ -1,0 +1,192 @@
+/**
+ * Folder v1.05
+ * spamReader reads the spamd log and set spam attributes 
+ * accordingly in MessageInput object by pid
+ * v1.05
+ * 
+ * @author Ryan Nasr
+ */
+/*IMPORTS*/
+import java.util.Scanner;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.io.IOException;
+import java.io.File;
+public class spamReader extends logReader {
+	/*Contains queue of messageInput while reading*/
+	private queue<messageInput> qpid=new queue<messageInput>();
+	/**
+	 * default constructor for spamReader
+	 */
+	public spamReader(){
+		super(globalClass.log_spam,"spamReader");
+	}
+	/**
+	 * 
+	 * @param f file name of the log to read (spamd)
+	 */
+	public spamReader(String f){
+		super(f,"spamReader");
+	}
+	/*PARSER*/
+	public void parseLine(String a) throws unknownLineException{
+		/*VARIABLES TO STORE*/
+		messageInput global=new messageInput();
+		messageInput temp;
+		messageInput.connectionInfo cInfo=global.new connectionInfo();
+		messageInput.spamResultInfo sInfo=global.new spamResultInfo();
+		messageInput temporaryPop;
+		String tstamp;
+		String type;
+		boolean same=false;
+		long pid;
+		/*SPLITS THE LINE PASSED AS A ARARY OF STRING AT EVERY SPACE IN LINE*/
+		String[] all=a.split(" ");
+		tstamp=all[0];
+		/*GETS RID OF THE <PID> BRACKETS AROUND PID*/
+		char[] retemp=all[1].toCharArray();
+		String t=all[1];
+		all[1]="";
+		for (int i=1;i<t.length()-1;i++)
+			all[1]+=retemp[i];
+		pid=Long.parseLong(all[1]);
+		/*VERIFIES IF TYPE IS UNKNOWN*/
+		type=all[4].toLowerCase();
+		if (type.equals("child")) type="nothing";
+		/*VERIFIES IF TYPE IS CLEAN*/
+		if (type.equals("clean")) type="goodmsg";
+		/*IF TYPE IS NOT CLEAN, NOT CHILD, NOT CONNECTION -> UNKNOWN TYPE*/
+		if (type.charAt(0)=='c' && !type.equals("connection")) type="unknown";
+		/*SETS LOCAL VARIABLES*/
+		String tempScore="";
+		String finalScore="";
+		char[] tempCharScore=tempScore.toCharArray();
+		/*SWITCHES THE TYPE*/
+		switch (type.charAt(0)){
+		/*CONNECTION TYPE*/
+		case 'c':
+			/*CREATE CONNECTIONINFO OBJECT AND ANEW MESSAGEINPUT OBJECT WITH CINFO AS ATTRIBUTE*/
+			cInfo=global.new connectionInfo(all[6],all[7],Integer.parseInt(all[10]));
+			String tuid=all[1]+all[10];
+			long uid=Long.parseLong(tuid);
+			tstamp=convertTimeStamp(tstamp);
+			if (qpid.findByPID(pid)==null){
+				temp=new messageInput(tstamp,pid,cInfo,null,null,pid);
+				qpid.insert(temp);
+			}
+			break;
+		/*PROCESSING TYPE*/
+		case 'p':
+			/*FIRST FINDS IF PID READ IN LINE ALREADY EXIST, IF NOT THROW EXCEPTION*/
+			temporaryPop=qpid.findByPID(pid);
+			String spamTimestamp=tstamp;
+			String mId=all[6];
+			/*IF FOUND - CREATE A NEW spamResultInfo object AND STORE IT IN THE messageInput found in the queue*/
+			if (temporaryPop!=null){
+				sInfo=global.new spamResultInfo(spamTimestamp,mId,-1,-1,-1,false);
+				temporaryPop.setSpamResult(sInfo);
+			}
+			else
+				/*NO MESSAGE WITH GIVEN PID WAS FOUND*/
+				throw new unknownLineException(pid);
+			break;
+		/*IDENTIFIED TYPE*/
+		case 'i':
+			/*SEARCHES QUEUE BY PID*/
+			temporaryPop=qpid.findByPID(pid);
+			tempScore=all[6];
+			finalScore="";
+			tempCharScore=tempScore.toCharArray();
+			/*CLEANS THE SCORE VARIABLE BY REMOVING THE '/' CHAR*/
+			for (int i=1;i<(tempCharScore.length)-1;i++){
+				if (tempCharScore[i]=='/')
+					break;
+					finalScore+=tempCharScore[i];
+			}
+			/*GETS ALL MISSING INFO FOR spamInfoObject AND SETS TO THE messageInput FOUND IN QUEUE*/
+			double scr=Double.parseDouble(finalScore);
+			double tme=Double.parseDouble(all[10]);
+			int sze=Integer.parseInt(all[12]);
+			if (temporaryPop!=null){
+				sInfo=temporaryPop.getSpamResult();
+				if (sInfo==null) sInfo=global.new spamResultInfo();
+				sInfo.setScore(scr);
+				sInfo.setTimeTook(tme);
+				sInfo.setMsgSize(sze);
+				/*SPAM IS TRUE SINCE IDENTIFIED TYPE MEANS FOUND SPAM*/
+				sInfo.setSpam(true);
+				temporaryPop.setSpamResult(sInfo);
+			}
+			else
+				throw new unknownLineException(pid);
+			break;
+		/*CLEAN MESSAGE*/
+		case 'g':
+			/*FINDS messageInput in queue by PID*/
+			temporaryPop=qpid.findByPID(pid);
+			tempScore=all[6];
+			finalScore="";
+			tempCharScore=tempScore.toCharArray();
+			/*CLEANS SCORE*/
+			for (int i=1;i<(tempCharScore.length)-1;i++){
+				if (tempCharScore[i]=='/')
+					break;
+					finalScore+=tempCharScore[i];
+			}
+			/*GETS MISSING ATTRIBUTES in spamResultInfo*/
+			double scoreclean=Double.parseDouble(finalScore);
+			double timeclean=Double.parseDouble(all[10]);
+			int sizeclean=Integer.parseInt(all[12]);
+			/*SETS new spamResultInfo in messageInput found in queue*/
+			if (temporaryPop!=null){
+				sInfo=temporaryPop.getSpamResult();
+				if (sInfo==null) sInfo=global.new spamResultInfo();
+				sInfo.setScore(scoreclean);
+				sInfo.setTimeTook(timeclean);
+				sInfo.setMsgSize(sizeclean);
+				/*SPAM SET TO FALSE SINCE CLEAN MESSAGE MEANS NO SPAM*/
+				sInfo.setSpam(false);
+				temporaryPop.setSpamResult(sInfo);
+			}
+			else
+				throw new unknownLineException(pid);
+			break;
+		/*RESULT TYPE*/
+		case 'r':
+			/*FIND messageInput in queue by pid*/
+			temporaryPop=qpid.findByPID(pid);
+			messageInput tempMIN=null;;
+			/*IF NOTHNG IS NULL - IE: EVERYTHING WAS WELL SET*/
+			if (temporaryPop!=null && temporaryPop.getSpamResult()!=null && temporaryPop.getConnectionInfo()!=null){
+					/*POP THE MESSAGE OUT THE QUEUE CAUSE ITS END*/
+					try{
+						tempMIN=qpid.pop();
+					}
+					catch(emptyListException e){}
+					
+					if (tempMIN!=null && tempMIN.getSpamResult().getScore()!=-1){
+						/*ADD TO HASHTABLE ONLY IF ALL ATTRIBUTES ARE CORRECT*/
+						//timestampContainer tsc=new timestampContainer(tempMIN.getCreationTimestamp(),tempMIN);
+						//globalClass.listOfTsMi.addToStart(tsc);
+						globalClass.hashOfMessageInput.addToHashTable(tempMIN);
+						
+						//globalClass.hashOfSpamMessages.addToHashTable(tempMIN);
+					}
+					else{
+						/*IF SOMETHING MISSING (ie: SCORE, TIME etc) THROW EXCEPTION*/
+						qpid.findAndDelete(pid);
+						throw new unknownLineException("missing stuff");
+					}
+					//System.out.println(globalClass.hashOfMessageInput.convertToList().getSize());
+			}
+			else{
+				/*IF SOMETHING IS NULL: ie: cInfo, sInfo) POP THE messageInput OUT THE QUEUE*/
+				if (temporaryPop!=null)
+					qpid.findAndDelete(pid);
+			}
+			break;
+		}
+	}
+}

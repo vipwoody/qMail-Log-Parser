@@ -1,0 +1,179 @@
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.util.Calendar;
+import java.util.Scanner;
+import java.io.FileNotFoundException;
+import java.sql.Timestamp;
+/**
+ * Folder v1.01
+ * Log Reader ABSTRACT class
+ * logReader.java v1.05
+ * @author Ryan
+ * 
+ */
+
+public class logReader {
+	/*SCANNER TO READ LOG*/
+	protected Scanner scan;
+	/*contains fis of log*/
+	protected FileInputStream fis;
+	/*contains fos off error*/
+	protected FileOutputStream errFos;
+	/*prints to error log*/
+	protected PrintWriter errWriter;
+	/*COUTNS # of error*/
+	protected long errcntr;
+	/*COUNTS # lines*/
+	protected long linecntr;
+	/*contains filename of log to read from*/
+	protected String fileName;
+	/*contains name of childs calling readFile*/
+	private String readerName;
+	public enum month{january,february,march,april,may,june,july,august,september,october,november,december};
+	
+	/**
+	 * default constructor for logReader
+	 * @param f
+	 */
+	public logReader(String f, String name){
+		fileName=f;
+		readerName=name;
+		try{
+			errFos=new FileOutputStream(globalClass.log_error,true);
+			errWriter=new PrintWriter(errFos,true);
+		}
+		catch(FileNotFoundException e){
+			System.out.println("error file was not found...");
+		}
+	}
+	/**
+	 * sets fileName
+	 * @param f
+	 */
+	public void setFileName(String f){
+		/*SETS FILENAME*/
+		fileName=f;
+	}
+	/**
+	 * 
+	 * @return fileName
+	 */
+	public String getfileName(){
+		String temp=fileName;
+		return temp;
+	}
+	/*OVERWRITE THIS METHOD*/
+	public void parseLine(String s) throws unknownLineException{
+		
+	}
+	/**
+	 * reads file and process
+	 */
+	public void readFile(){
+		/*Contains log directory*/
+		String fName=fileName;
+		/*TRIES to set all and read*/
+		linecntr=0;
+		try{
+			fis=new FileInputStream(fName);
+			scan=new Scanner(fis);
+			while(scan.hasNext()){
+				linecntr++;
+				//System.out.println(linecntr);
+				try{
+					if (linecntr%100==0)
+						System.out.println(".");
+					else
+						System.out.print(".");
+					parseLine(scan.nextLine());
+				 }
+				catch(unknownLineException e){
+					writeError(linecntr,readerName,false); //line error #, reader index, false for not end
+				}
+			}
+		}
+		catch(FileNotFoundException e){
+			System.out.println("File was not found\texiting...");
+			System.exit(0);
+		}
+		finally{
+			writeError(0,readerName,true); //line error #, reader index, true for end
+			scan.close();
+			errWriter.close();
+		}
+	}
+	
+	/**
+	 * WRITES TO ERROR LOG in log directory
+	 * @param a
+	 * @param b
+	 * @param t
+	 */
+	public void writeError(long a,String b,boolean t){ //b contains reader name
+		if (!t){ 
+			errWriter.println("Error in log <"+b+"> @ line #"+a);
+			errcntr++;
+		}
+		if (t){
+			double errper=((double)errcntr/linecntr)*100;
+			errWriter.println();
+			errWriter.println("---------------------------------");
+			errWriter.println("SUMMARY <"+b+">");
+			errWriter.println("---------------------------------");
+			errWriter.println("Lines read: "+linecntr);
+			errWriter.println("Errors found: "+errcntr);
+			errWriter.println("Error percentage " + Math.round(errper)+"%");
+			errWriter.println("---------------------------------");
+			errWriter.println();
+		}
+	}
+	/**
+	 * Converts timestamp to to human friendly date
+	 * @param t
+	 */
+	public static String convertTimeStamp(String t){
+		t="0x".concat(t.substring(9,17));
+		int newTime=Integer.decode(t);
+		Calendar calendar = Calendar.getInstance();
+		int dayOfYear=(int)Math.round(((newTime/86400)%365.2425)+0.5);
+		int year=(int)((newTime/31536000)+1970);
+		int monthInt=-1;
+		calendar.set(Calendar.YEAR, 2010);
+        calendar.set(Calendar.DAY_OF_YEAR, dayOfYear);
+        String monthString=(calendar.getTime().toString()).split(" ")[1].toLowerCase();
+        switch(month.valueOf(monthString)){
+	        case january:monthInt=1;
+	        	break;
+	        case february:monthInt=2;
+	        	break;
+	        case march:monthInt=3;
+	        	break;
+	        case april:monthInt=4;
+	        	break;
+	        case may:monthInt=5;
+	        	break;
+	        case june:monthInt=6;
+	        	break;
+	        case july:monthInt=7;
+	        	break;
+	        case august:monthInt=8;
+	        	break;
+	        case september:monthInt=9;
+	        	break;
+	        case october:monthInt=10;
+	        	break;
+	        case november:monthInt=11;
+	        	break;
+	        case december:monthInt=12;
+	        	break;
+	        	
+	        }
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        int hours=(newTime/3600)%24;
+        int mins=(newTime/60)%60;
+        int sec=newTime%60;
+		String newTimeStamp=""+dayOfMonth+"/"+monthInt+"/"+year+"/"+hours+":"+mins+":"+sec+"";
+		return newTimeStamp;
+	}
+}

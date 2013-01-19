@@ -1,0 +1,19 @@
+import java.util.Calendar;
+ 
+public class DayYearToDayMonth 
+{
+    public static void main(String[] args)
+    {     
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, 1988);
+        calendar.set(Calendar.DAY_OF_YEAR, 145);
+        System.out.println("\nThe date of Calendar is: " +
+ calendar.getTime());
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);  
+        System.out.println("The day of month: " +
+ dayOfMonth);  
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+    System.out.println("The day of week: " + 
+dayOfWeek);
+    }
+}

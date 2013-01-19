@@ -1,0 +1,162 @@
+
+public class Tree<T> {
+	private treeNode<T> root;
+	private int h;
+	
+	public class treeNode<T>{
+		private long ID;
+		private T obj;
+		private treeNode<T> left;
+		private treeNode<T> mid;
+		private treeNode<T> right;
+		
+		/**
+		 * default constructor
+		 */
+		public treeNode(){
+			ID=-1;
+			left=null;
+			mid=null;
+			right=null;
+		}
+		/**
+		 * 
+		 * @param id for the ID
+		 * @param l for the left node
+		 * @param m for the mid node
+		 * @param r for the right node
+		 */
+		public treeNode(long id, T o, treeNode<T> l, treeNode<T> m,treeNode<T> r){
+			ID=id;
+			obj=o;
+			left=l;
+			mid=m;
+			right=r;
+		}
+		/**
+		 * 
+		 * @param id for the id
+		 * @param nxt nxt could be the left, mid, or right node
+		 * @param b if int b is negative then nxt is the left node, if its 0 then its mid
+		 */
+		public treeNode(long id,treeNode<T> nxt,int b){
+			ID=id;
+			if(b<0){
+				left=nxt;
+			}else if(b==0){
+				mid=nxt;
+			}else{
+				right=nxt;
+			}
+		}
+		
+		/**
+		 * 
+		 * @return ID
+		 */
+		public long getID(){
+			return ID;
+			}
+		/**
+		 * 
+		 * @return left
+		 */
+		public treeNode<T> getLeft(){
+			return left;
+		}
+		/**
+		 * 
+		 * @return mid
+		 */
+		public treeNode<T> getMid(){
+			return mid;
+		}
+		/**
+		 * 
+		 * @return right
+		 */
+		public treeNode<T> getRight(){
+			return right;
+		}
+		
+		/**
+		 * 
+		 * @param id for the ID
+		 */
+		public void setID(long id){
+			ID=id;
+		}
+		/**
+		 * 
+		 * @param l for the left Node
+		 */
+		public void setLeft(treeNode<T> l){
+			left=l;
+		}
+		/**
+		 * 
+		 * @param m for the mid Node
+		 */
+		public void setMid(treeNode<T> m){
+			mid=m;
+		}
+		/**
+		 * 
+		 * @param r for the right Node
+		 */
+		public void setRight(treeNode<T> r){
+			right=r;
+		}
+		
+	}
+	
+	public Tree(){
+		root=null;
+		h=0;
+	}
+	
+	
+	public long getRoot(){
+		return root.getID();
+	}
+	public int getH(){
+		return h;
+	}
+	
+	public void setRoot(treeNode<T> r){
+		root=r;
+	}
+	public void setH(int H){
+		h=H;
+	}
+	
+	public list<T> find(long id){
+		if(h==0){
+			return null;
+		}else{
+			treeNode<T> temp=root;
+			list<T> tempList=new list<T>();
+			while(id!=temp.getID()){
+				if(id>temp.getID())
+					temp=temp.getRight();
+				else if(id<temp.getID())
+					temp=temp.getLeft();
+				else
+					break;
+			}
+			while (temp.getMid()!=null){
+				tempList.addToStart(temp.getID());
+			}
+			
+			//make new Linked list and copy all mid into new linked list
+			//for(int i=0;i<wanted.length;i++)
+				
+			return tempList;
+		}
+	}
+	public void add(long id){
+		
+		
+	}
+	
+}

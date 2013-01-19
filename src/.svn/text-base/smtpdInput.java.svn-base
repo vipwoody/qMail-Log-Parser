@@ -1,0 +1,334 @@
+/**
+ * 
+ * Objects created from smtpdReader during parsing of log (qmailsmtpd)
+ * @author Ryan,Chris
+ *
+ */
+import java.io.Serializable;
+public class smtpdInput implements Serializable {
+	/*CONTAINS PID*/
+	private long pid;
+	/*TIMESTAMP*/
+	private String timeStamp;
+	/*IP*/
+	private String ipAddress;
+	/*STATUS ON END*/
+	private int status;
+	/*SIMSCAN RESULT IF ANY*/
+	private simScanResult ssr;
+	/*IF MESSAGE IS OK*/
+	private boolean passed;
+	/*DOMAIN FROM*/
+	private String domain;
+	/**
+	 * contains simscan result of a message
+	 * @author Ryan,Chris
+	 *
+	 */
+	public class simScanResult implements Serializable{
+		/*SPAM SCORE*/
+		double score;
+		/*TIME TAKEN*/
+		double time;
+		/*SPAM SUBJECT*/
+		String subject;
+		/*SPAM FLAG TRUE IF !null*/
+		boolean spam;
+		/*EMAIL OF SENDER*/
+		String email;
+		/*IP OF SENDER*/
+		String ipFrom;
+		/*VIRUS FLAG*/
+		/*VIRUS TYPE*/
+		String virusType;
+		boolean virus;
+		/**
+		 * default constructor
+		 */
+		public simScanResult(){
+			score=-1;
+			time=-1;
+			subject="NOT_FOUND";
+			spam=false;
+			ipFrom="NOT_SET";
+			virus=false;
+			virusType="NOT_FOUND";
+		}
+		/**
+		 * parameterized constructor
+		 * @param s
+		 * @param t
+		 * @param subj
+		 * @param ipf
+		 */
+		public simScanResult(double s, double t, String subj,String ipf,boolean v,String vt,boolean spm){
+			score=s;
+			time=t;
+			subject=subj;
+			ipFrom=ipf;
+			spam=true;
+			virus=v;
+			virusType=vt;
+			spam=spm;
+		}
+		/**
+		 * copy constructor
+		 * @param temp
+		 */
+		public simScanResult(simScanResult temp){
+			if(temp!=null){				
+				score=temp.getScore();
+				time=temp.getTime();
+				subject=temp.getSubject();
+				ipFrom=temp.getIpFrom();
+				spam=temp.isSpam();
+				virus=temp.isVirus();
+				virusType=temp.getVirusType();
+			}
+			else 
+				new simScanResult();
+		}
+		public boolean isVirus(){
+			return virus;
+		}
+		public String getVirusType(){
+			String temp=virusType;
+			return temp;
+		}
+		public void setVirus(boolean v){
+			virus=v;
+		}
+		public void setVirusType(String vt){
+			virusType=vt;
+		}
+		/**
+		 * return score of spam
+		 * @return
+		 */
+		public double getScore(){
+			return score;
+		}
+		/**
+		 * returns time
+		 * @return
+		 */
+		public double getTime(){
+			return time;
+		}
+		/**
+		 * returns subject of message
+		 * @return
+		 */
+		public String getSubject(){
+			String temp=subject;
+			return temp;
+		}
+		/**
+		 * returns ip from
+		 * @return
+		 */
+		public String getIpFrom(){
+			String temp=ipFrom;
+			return temp;
+		}
+		/**
+		 * returns true if spam
+		 * @return
+		 */
+		public boolean isSpam(){
+			return spam;
+		}
+		/**
+		 * sets score
+		 * @param s
+		 */
+		public void setScore(double s){
+			score=s;
+		}
+		/**
+		 * sets time
+		 * @param t
+		 */
+		public void setTime(double t){
+			time=t;
+		}
+		/**
+		 * set subject
+		 * @param s
+		 */
+		public void setSubject(String s){
+			subject=s;
+		}
+		/**
+		 * sets ip from
+		 * @param ip
+		 */
+		public void setIpFrom(String ip){
+			ipFrom=ip;
+		}
+		/**
+		 * sets spam
+		 * @param s
+		 */
+		public void setSpam(boolean s){
+			spam=s;
+		}
+		public boolean equals(simScanResult temp){
+			return (score==temp.getScore()&&time==temp.getTime()&&subject.equals(temp.getSubject())&&
+					ipFrom.equals(temp.getIpFrom())&&spam==temp.isSpam()&&virus==temp.isVirus()&&virusType.equals(temp.getVirusType()));
+		}
+		public String toString(){
+			return ("Sim Scan Result of Message PID#" +pid+
+					"\n-------------------------------\n"+
+					"Spam Result\n"+
+					"-----------\nScore: "+score+" | Time: "+time+" | Subject: "+
+					subject+" | IpFrom: "+ipFrom+" | spam: "+spam+
+					"\n-----------\nVirus Result\n"+
+					"-----------\nTime: "+time+" | Virus: "+virus+" | VirusType: "+virusType+
+					" | From: "+ipFrom);
+		}
+	}
+	/**
+	 * default constructor
+	 */
+	public smtpdInput(){
+		pid=-1;
+		timeStamp="NOT_SET";
+		ipAddress="NOT_SET";
+		status=-1;
+		passed=false;
+		domain="NOT_SET";
+		ssr=null;
+	}
+	/**
+	 * parameterized constructor
+	 * @param p
+	 * @param t
+	 * @param ip
+	 * @param sta
+	 * @param ss
+	 */
+	public smtpdInput(long p,String t, String ip,int sta,boolean pass, String d,simScanResult ss){
+		pid=p;
+		timeStamp=t;
+		ipAddress=ip;
+		passed=pass;
+		domain=d;
+		status=sta;
+		if (ss!=null)
+			ssr=new simScanResult(ss);
+		else
+			ssr=null;
+	}
+	/**
+	 * gets if passed
+	 * @return
+	 */
+	public boolean getPass(){
+		return passed;
+	}
+	/**
+	 * gets domain
+	 * @return
+	 */
+	public String getDomain(){
+		String temp=domain;
+		return temp;
+	}
+	/**
+	 * get pid
+	 * @return
+	 */
+	public long getPid(){
+		return pid;
+	}
+	/**
+	 * get timestamp
+	 * @return
+	 */
+	public String getTimestamp(){
+		String temp=timeStamp;
+		return temp;
+	}
+	/**
+	 * gets ip
+	 * @return
+	 */
+	public String getIpAddress(){
+		String temp=ipAddress;
+		return temp;
+	}
+	/**
+	 * returns status
+	 * @return
+	 */
+	public int getStatus(){
+		return status;
+	}
+	/**
+	 * sets if passed
+	 * @param p
+	 */
+	public void setPass(boolean p){
+		passed=p;
+	}
+	/**
+	 * sets domain
+	 * @param d
+	 */
+	public void setDomain(String d){
+		domain=d;
+	}
+	/**
+	 * sets pid
+	 * @param p
+	 */
+	public void setPid(long p){
+		pid=p;
+	}
+	/**
+	 * sets timestamp
+	 * @param t
+	 */
+	public void setTimestamp(String t){
+		timeStamp=t;
+	}
+	/**
+	 * sets ip
+	 * @param ip
+	 */
+	public void setIp(String ip){
+		ipAddress=ip;
+	}
+	/**
+	 * sets status
+	 * @param s
+	 */
+	public void setStatus(int s){
+		status=s;
+	}
+	/**
+	 * sets simscan
+	 * @param s
+	 */
+	public void setSimScanResult(simScanResult s){
+		ssr=new simScanResult(s);
+	}
+	/**
+	 * gets simscan
+	 * @return
+	 */
+	public simScanResult getSimScanResult(){
+			return (new simScanResult(ssr));
+	}
+	public String toString(){
+		return pid+"";
+	}
+	public String showInfo(){
+		return ("--------------------------------------------------------------------\n" +
+				"|Message created @ "+timeStamp+" | pid #"+pid+" | Passed: "+passed+" | Domain: "+domain+" | "+
+				"IpFrom: "+ipAddress+" | endStatus: "+status+
+				" |\nSimscan result Info:"+ssr);
+	}
+	
+}
