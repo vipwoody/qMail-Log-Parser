@@ -24,8 +24,10 @@ recipient’s address is valid and whether the connection is allowed before init
 will process the message from there.
 Qmail-smtpd checks to see if the message should be relayed and if not opens qmail-queue to store
 the mail to the disk. Next qmail-send is run and looks at the envelope recipient to see if the @domain.com
-is a local or remote delivery. If the recipient is local then it will trigger qmail-lspawn which looks at themail box name (ex: nina@concordia.ca). The name is checked to make sure nina is a qmail-user, the
-account exists and her uid is nonzero. If the name checks out then control is given over to nina and qmaillocal is run. Qmail-local writes the message to the mailbox in mbox format.
+is a local or remote delivery. If the recipient is local then it will trigger qmail-lspawn which looks at 
+themail box name (ex: nina@concordia.ca). The name is checked to make sure nina is a qmail-user, the
+account exists and her uid is nonzero. If the name checks out then control is given over to nina and 
+qmaillocal is run. Qmail-local writes the message to the mailbox in mbox format.
 However if qmail-send determines that the @domain.com is a remote delivery it will run qmail-rspawn
 which in turns opens qmail-remote. Qmail-remote looks up the host name and finds its DNS MX/A which
 is connected to by SMTP effectively beginning the MTA process again.
@@ -37,6 +39,10 @@ email or reject it; deleting it instantly or bouncing it back to sender. Please 
 page of the document.
 
 3. Tracing a message through our program The program begins by reading the logfiles and parsing their
-data to store in  separate classes. Since we had difficulty linking the logs together, a message that appears in multiple logs will come up in multiple data objects that areunconnected. For
+data to store in  separate classes. Since we had difficulty linking the logs together, a message that 
+appears in multiple logs will come up in multiple data objects that areunconnected. For
 instance, if a message is tagged as being spam it will appear in the spamd log and be read by thespamReader class.
-SpamReader will store the message’s important details in a messageInput object which is then added to a public hash table inside globalClass. globalClass stores all the message objects so that they can be accessed for queries. So effectively, messages are picked up by the program in log files, parsed into object files and then sent to globalClass to be stored in hash tables.
+SpamReader will store the message’s important details in a messageInput object which is then added to a public
+hash table inside globalClass. globalClass stores all the message objects so that they can be accessed for queries. 
+So effectively, messages are picked up by the program in log files, parsed into object files and then sent to 
+globalClass to be stored in hash tables.
