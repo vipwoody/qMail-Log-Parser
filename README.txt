@@ -40,4 +40,3 @@ page of the document.
 data to store in  separate classes. Since we had difficulty linking the logs together, a message that appears in multiple logs will come up in multiple data objects that areunconnected. For
 instance, if a message is tagged as being spam it will appear in the spamd log and be read by thespamReader class.
 SpamReader will store the message’s important details in a messageInput object which is then added to a public hash table inside globalClass. globalClass stores all the message objects so that they can be accessed for queries. So effectively, messages are picked up by the program in log files, parsed into object files and then sent to globalClass to be stored in hash tables.
-
